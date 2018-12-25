@@ -57,17 +57,6 @@ done
 :||{
     初始化全局变量
 }
-cmdb_file="${data_dir}/${cmdb_switcher_file_name}"
-monitor_file="${data_dir}/${monitor_switcher_file_name}"
-
-buffer_header="${monitor_switcher_buffer_header}"
-buffer_body_file="${data_dir}/${monitor_switcher_buffer_post_body}"
-
-cmdb_add_file="${data_dir}/${cmdb_switcher_file_buffer_add}"
-cmdb_del_file="${data_dir}/${cmdb_switcher_file_buffer_delete}"
-ping_add_file="${data_dir}/${ping_switcher_file_buffer_add}"
-ping_del_file="${data_dir}/${ping_switcher_file_buffer_delete}"
-
 csv2json_file="${util_dir}/csv2json
 json2csv_file="${util_dir}/json2csv
 
