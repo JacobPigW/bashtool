@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+:||{
+    程序入口
+
+    Author: Jacob
+}
+
+# . "$HOME/.bash_profile"
+
+export SCRIPT_HOME=$(dirname "$0")
+export PATH=$SCRIPT_HOME/service:$SCRIPT_HOME/auto:$SCRIPT_HOME/util:$PATH
+
+. options
+
+. yaml
+. time
+. log
+
+. init
+. util
+. http
+
+. data
+. compare
+

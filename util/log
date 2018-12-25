@@ -1,0 +1,51 @@
+:||{
+    日志记录
+
+    Author: Jacob
+}
+
+
+if [ "$log" ]; then
+  return
+fi
+
+export log="log"
+
+:||{
+    日志主方法
+}
+log() {
+    local now=$(get-now)
+    local message="${1}"
+    local level="${2}"
+
+    echo "${now} [$0] ${level} :: ${message}" >> "${log_file}"
+}
+
+:||{
+    错误日志
+}
+error() {
+    log "$1" "ERROR"
+}
+
+:||{
+    信息日志
+}
+info() {
+    log "$1" "INFO"
+}
+
+:||{
+    调试日志
+}
+debug() {
+    log "$1" "DEGUG"
+}
+
+:||{
+    警告日志
+}
+warn() {
+    log "$1" "WARN"
+}

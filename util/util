@@ -1,0 +1,42 @@
+:||{
+    通用工具类
+
+    Author: Jacob
+}
+
+
+if [ "$util" ]; then
+  return
+fi
+
+export util="util"
+
+:||{
+    json转换为csv
+}
+json-2-csv() {
+    jq -r -f "${json2csv_file}" 
+}
+
+:||{
+    csv转换为json
+}
+csv-2-json() {
+    jq -R -s -c -f "${csv2json_file}"
+}
+
+:||{
+    删除指定的文件
+}
+rm-file() {
+    local file="${1}"
+    [ -s "${file}" ] && rm "${file}"
+}
+
+:||{
+    按指定字段去重
+}
+distinct-by() {
+    local column="${1}"
+    awk -v col=column '!a[$col]++'
+}

@@ -1,0 +1,65 @@
+# (message '("Author" ":" "Jacob"))
+# (message '("Comment" ":" "Args parameters"))
+:||{
+    程序参数及使用方式
+
+    Author: Jacob
+}
+
+
+help=no
+version=no
+
+PROFILE=
+
+opt=
+
+for option
+do
+    opt="$opt `echo $option | sed -e \"s/\(--[^=]*=\)\(.* .*\)/\1'\2'/\"`"
+    case "$option" in
+        -*=*) value=`echo "$option" | sed -e 's/[-_a-zA-Z0-9]*=//'` ;;
+        *) value="" ;;
+    esac
+
+    case "$option" in
+        -h|--help)               help=yes                      ;;
+        -v|--version)            version=yes                   ;;
+        --profile=*)             PROFILE="$value"              ;;
+        *)
+            echo "$0: error: invalid option \"$option\""
+            exit 1
+            ;;
+    esac
+done
+
+if [ $help = yes ]; then
+    cat << END
+
+  -h | --help                        print this message
+  -v | --version                     show version
+  --profile                          env: online || dev
+
+END
+    exit 1
+fi
+
+if [ $version = yes ]; then
+    cat << END
+
+  $0 is 1.0.0
+
+END
+    exit 1
+fi
+
+if [ ! $PROFILE ]; then
+    cat << END
+
+  profile is not blank !!
+  need help?
+  please exec " $0 -h "
+
+END
+    exit 1
+fi

@@ -1,0 +1,10 @@
+monitor:
+  switcher:
+    url: http://localhost:18080/monitor/switchers/
+
+    buffer:
+      save: http://localhost:18080/monitor/switchers/buffer
+
+cmdb:
+  switcher:
+    url: http://localhost:18080/monitor/cmdb/switchers/

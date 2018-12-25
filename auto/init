@@ -1,0 +1,88 @@
+:||{
+    程序初始化：
+    1. 创建相应的目录
+    2. 加载配置文件，初始化变量
+    3. 统一命令调用
+
+    Author: Jacob
+}
+
+
+# 配置文件目录
+conf_dir="$SCRIPT_HOME/conf"
+[ ! -d "$conf_dir" ] && mkdir -p "$conf_dir"
+
+# prod配置文件目录
+online_conf_dir="$conf_dir/prod"
+[ ! -d "$online_conf_dir" ] && mkdir -p "$online_conf_dir"
+
+# dev配置文件目录
+dev_conf_dir="$conf_dir/dev"
+[ ! -d "$dev_conf_dir" ] && mkdir -p "$dev_conf_dir"
+
+# 日志目录
+logs_dir="$SCRIPT_HOME/logs"
+[ ! -d "$logs_dir" ] && mkdir -p "$logs_dir"
+
+# 数据目录
+data_dir="$SCRIPT_HOME/data"
+[ ! -d "$data_dir" ] && mkdir -p "$data_dir"
+
+# 工具目录
+util_dir="$SCRIPT_HOME/util"
+[ ! -d "$util_dir" ] && mkdir -p "$util_dir"
+
+# 自动执行脚本目录
+auto_dir="$SCRIPT_HOME/auto"
+[ ! -d "$auto_dir" ] && mkdir -p "$auto_dir"
+
+# 业务相关目录
+service_dir="$SCRIPT_HOME/service"
+[ ! -d "$service_dir" ] && mkdir -p "$service_dir"
+
+:||{
+    初始化时加载配置文件
+}
+for file in $conf_dir/*.yaml
+do
+    eval "$(parse "$file")"
+done
+
+for file in $conf_dir/$PROFILE/*.yaml
+do
+    eval "$(parse "$file")"
+done
+
+
+:||{
+    初始化全局变量
+}
+cmdb_file="${data_dir}/${cmdb_switcher_file_name}"
+monitor_file="${data_dir}/${monitor_switcher_file_name}"
+
+buffer_header="${monitor_switcher_buffer_header}"
+buffer_body_file="${data_dir}/${monitor_switcher_buffer_post_body}"
+
+cmdb_add_file="${data_dir}/${cmdb_switcher_file_buffer_add}"
+cmdb_del_file="${data_dir}/${cmdb_switcher_file_buffer_delete}"
+ping_add_file="${data_dir}/${ping_switcher_file_buffer_add}"
+ping_del_file="${data_dir}/${ping_switcher_file_buffer_delete}"
+
+csv2json_file="${util_dir}/csv2json
+json2csv_file="${util_dir}/json2csv
+
+log_name="${log_name}"
+log_file="${logs_dir}/${log_name}"
+
+
+:||{
+    根据系统使用不同的jq命令
+}
+jq() {
+    sys_os=$(uname -s)
+    case "${sys_os}" in
+        "Darwin")   jq-mac "$@"     ;;
+        "Linux")    jq-linux "$@"   ;;
+        *)          jq-linux "$@"   ;;
+    esac
+}

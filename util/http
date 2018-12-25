@@ -1,0 +1,46 @@
+:||{
+    HTTP协议请求
+
+    Author: Jacob
+}
+
+
+if [ "$http" ]; then
+  return
+fi
+
+export http="http"
+
+:||{
+    GET请求
+}
+GET() {
+    local url=$1
+    curl -s -XGET "${url}"
+}
+
+:||{
+    POST请求
+}
+POST() {
+    local url=$1
+    local body=$2
+    curl -s -H "Content-Type: application/json" -XPOST "${url}" -d "${body}"
+}
+
+:||{
+    PUT请求
+}
+PUT() {
+    local url=$1
+    local body=$2
+    curl -s -H "Content-Type: application/json" -XPUT "${url}" -d "${body}"
+}
+
+:||{
+    DELETE请求
+}
+DELETE() {
+    local url=$1
+    curl -s -XDELETE "${url}"
+}

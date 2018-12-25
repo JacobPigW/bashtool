@@ -1,0 +1,44 @@
+:||{
+    获取不同格式的时间
+
+    Author: Jacob
+}
+
+
+if [ "$time" ]; then
+  return
+fi
+
+export time="time"
+
+:||{
+    获取当天的日期
+}
+function get-today {
+    local ret=$(date "+%Y-%m-%d")
+    echo "${ret}"
+}
+
+:||{
+    获取 n天前 的日期
+}
+function get-days-ago-by {
+    local ret=$(date -d -${1}day "+%Y%m%d")
+    echo "${ret}"
+}
+
+:||{
+    获取当前时间
+}
+function get-now {
+    local ret=$(date "+%Y-%m-%d %H:%M:%S")
+    echo "${ret}"
+}
+
+:||{
+    获取当前时间：长整形
+}
+function get-now-long {
+    local ret=$(date "+%s")
+    echo "${ret}"
+}
