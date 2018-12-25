@@ -40,3 +40,10 @@ distinct-by() {
     local column="${1}"
     awk -v col=column '!a[$col]++'
 }
+
+:||{
+    比较两个文件的内容，目前不通用
+}
+distinct-by() {
+   awk -F, 'NR==FNR{a[$1]}NR!=FNR&&!($1 in a){print}' "${1}" "${2}"
+}
