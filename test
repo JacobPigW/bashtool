@@ -24,3 +24,4 @@ export PATH=$SCRIPT_HOME/service:$SCRIPT_HOME/auto:$SCRIPT_HOME/util:$PATH
 . data
 . compare
 
+echo "${monitor_switcher_url}"
