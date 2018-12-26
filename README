@@ -1,5 +1,5 @@
-目录结构:
-  ./auto/: 脚本参数设定、脚本初始化
-  ./conf/: 配置文件（yaml配置文件），可指定不同的环境，如prod、dev等
-  ./util/: 通用的工具，jq、log、time、http、yaml文件解析等
-  ./file-name: 主程序
+> 目录结构:
+>> ./auto/: 脚本参数设定、脚本初始化
+>> ./conf/: 配置文件（yaml配置文件），可指定不同的环境，如prod、dev等
+>> ./util/: 通用的工具，jq、log、time、http、yaml文件解析等
+>> ./file-name: 主程序
