@@ -1,0 +1,167 @@
+MODULE_HOME="${SCRIPT_HOME}/${MODULE_NAME}"
+
+# 自动执行脚本目录
+auto_dir="$MODULE_HOME/auto"
+[ ! -d "$auto_dir" ] && mkdir -p "$auto_dir"
+
+
+:||{
+    模块入口程序代码
+}
+main() {
+    cat << END
+#!/usr/bin/env bash
+
+:||{
+    ${MODULE_NAME} 模块入口
+
+    Author: $(whoami)
+}
+
+export MODULE_HOME="\${SCRIPT_HOME}/${MODULE_NAME}"
+export PATH=\$MODULE_HOME/auto:\$PATH
+
+. yaml
+
+. init
+. options
+
+# utils
+. http
+. log
+. time
+. util
+
+END
+}
+
+
+:||{
+    模块初始化程序代码
+}
+init() {    
+    cat << END
+:||{
+    ${MODULE_NAME} 模块初始化
+
+    Author: $(whoami)
+}
+
+# 配置文件目录
+conf_dir="\$MODULE_HOME/conf"
+[ ! -d "\$conf_dir" ] && mkdir -p "\$conf_dir"
+
+# prod配置文件目录
+online_conf_dir="\$conf_dir/prod"
+[ ! -d "\$online_conf_dir" ] && mkdir -p "\$online_conf_dir"
+
+# dev配置文件目录
+dev_conf_dir="\$conf_dir/dev"
+[ ! -d "\$dev_conf_dir" ] && mkdir -p "\$dev_conf_dir"
+
+# 日志目录
+logs_dir="\$MODULE_HOME/logs"
+[ ! -d "\$logs_dir" ] && mkdir -p "\$logs_dir"
+
+# 数据目录
+data_dir="\$MODULE_HOME/data"
+[ ! -d "\$data_dir" ] && mkdir -p "\$data_dir"
+
+
+:||{
+    初始化时加载配置文件
+}
+for file in \$conf_dir/*.yaml
+do
+    [ -s \$file ] && eval "\$(parse "\$file")"
+done
+
+for file in \$conf_dir/\$PROFILE/*.yaml
+do
+    [ -s \$file ] && eval "\$(parse "\$file")"
+done
+
+
+:||{
+    初始化全局变量
+
+    e.g. log_file="\${logs_dir}/\${log_name}"
+}
+
+
+END
+}
+
+
+:||{
+    模块参数程序代码
+}
+args() {
+    cat << END
+:||{
+    ${MODULE_NAME} 模块参数及使用方式
+
+    Author: $(whoami)
+}
+
+
+help=no
+version=no
+
+PROFILE=
+
+opt=
+
+for option
+do
+    opt="\$opt \`echo \$option | sed -e \"s/\(--[^=]*=\)\(.* .*\)/\1'\2'/\"\`"
+    case "\$option" in
+        -*=*) value=\`echo "\$option" | sed -e 's/[-_a-zA-Z0-9]*=//'\` ;;
+        *) value="" ;;
+    esac
+
+    case "\$option" in
+        -h|--help)               help=yes                      ;;
+        -v|--version)            version=yes                   ;;
+        --profile=*)             PROFILE="\$value"              ;;
+        *)
+            echo "\$0: error: invalid option \"\$option\""
+            echo " please exec \"\${0} -h\" "
+            exit 1
+            ;;
+    esac
+done
+
+if [ \$help = yes ]; then
+    cat << MSG
+
+  -h | --help                        print this message
+  -v | --version                     show version
+  --profile                          env: online || dev
+
+MSG
+    exit 1
+fi
+
+if [ \$version = yes ]; then
+    cat << MSG
+
+  \$0 is 1.0.0
+
+MSG
+    exit 1
+fi
+
+if [ ! \$PROFILE ]; then
+    cat << MSG
+
+  profile is not blank !!
+  need help?
+  please exec " \$0 -h "
+
+MSG
+    exit 1
+fi
+
+END
+}

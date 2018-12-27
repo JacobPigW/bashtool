@@ -1,20 +1,22 @@
 #!/usr/bin/env bash
 
 :||{
-    程序入口
+    主程序入口
 
     Author: Jacob
 }
 
-# . "$HOME/.bash_profile"
+[ -f $HOME/.bash_profile ] && . "$HOME/.bash_profile"
+[ -f $HOME/.bashrc ] && . "$HOME/.bashrc"
 
 export SCRIPT_HOME=$(dirname "$0")
-export PATH=$SCRIPT_HOME/auto:$SCRIPT_HOME/util:$PATH
+export PATH=$SCRIPT_HOME/auto:$SCRIPT_HOME/meta:$SCRIPT_HOME/util:$PATH
 
-echo "${monitor_switcher_file_name}"
-
-. yaml
 . init
 . options
 
-echo "${monitor_switcher_file_name}"
+export -f jq
+
+if [ "${MODULE}" ]; then
+    ${SCRIPT_HOME}/${MODULE}/${MODULE} 
+fi

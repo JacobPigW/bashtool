@@ -4,19 +4,21 @@
     Author: Jacob
 }
 
-
 help=
 version=
 
 create=
 rename=
 delete=
+delete_all=
 
 MODULE=
 NEW_MODULE=
 COMMENT=
 
 opt=
+
+MODULE_NAME=
 
 for option
 do
@@ -31,6 +33,7 @@ do
         -v|--version)            version=yes                   ;;
         --create)                create=yes                    ;;
         --delete)                delete=yes                    ;;
+        --delete-all)            delete_all=yes                ;;
         --comment=*)             COMMENT="${value}"            ;;
         --module=*)              MODULE="${value}"             ;;
         --new-name=*)            NEW_MODULE="${value}"         ;;
@@ -51,7 +54,7 @@ if [ "${help}" ]; then
   --create                           创建模块，加此参数，则module和comment必须指定，与 --rename --delete 不能同时出现
   --rename                           修改模块名，加此参数，则module new-name comment必须指定，与 --create --delete 不能同时出现
   --delete                           删除模块，加此参数，则module必须指定，与 --rename --create 不能同时出现
-  --module=module-name               指定模块名
+  --module=module-name               指定模块名，单独使用时，表示运行指定的模块
   --new-name=new-module-name         指定新的模块名，--rename 配合使用
 
 END
@@ -74,8 +77,15 @@ echo-msg() {
 }
 
 all-exists() {
-    echo-msg "--create --delete --rename 三个参数，同一时间只能出现一次"
+    echo-msg "--create --delete --rename --delete-all 参数，同一时间只能出现一次"
     exit 1
+}
+
+generate-code() {
+    . code
+    main > "${SCRIPT_HOME}/${MODULE}/${MODULE}" && chmod u+x "${SCRIPT_HOME}/${MODULE}/${MODULE}"
+    init > "${SCRIPT_HOME}/${MODULE}/auto/init"
+    args > "${SCRIPT_HOME}/${MODULE}/auto/options"
 }
 
 create-module() {
@@ -84,6 +94,8 @@ create-module() {
         mkdir -p "${module_dir}"
         echo "${1} #${2}" >> "${module_file}"
         echo-msg "创建模块：${1} 成功！路径为：${module_dir}"
+        MODULE_NAME="${MODULE}"
+        generate-code
     fi
 }
 
@@ -91,7 +103,7 @@ create-module() {
     创建 module 的逻辑
 }
 if [ "${create}" ]; then
-    if [[ "${rename}" || "${delete}" ]]; then
+    if [[ "${rename}" || "${delete}" || "${delete_all}" ]]; then
         all-exists
     fi
 
@@ -117,15 +129,34 @@ delete-module() {
     删除 module 的逻辑
 }
 if [ "${delete}" ]; then
-    if [[ "${rename}" || "${create}" ]]; then
+    if [[ "${rename}" || "${create}" || "${delete_all}" ]]; then
         all-exists
     fi
 
     if [[ ! "${MODULE}" ]]; then
         echo-msg "删除模块，必须指定模块名，--module不能为空"
         exit 1
-    else
+    fi
+
+    read -p "确定删除 ${MODULE} 模块（删除后不可恢复）？[y|n] : " answer
+    if [ "${answer}" = "y" ]; then
         delete-module "${MODULE}"
+        exit 0
+    fi
+fi
+
+if [ "${delete_all}" ]; then
+    if [[ "${rename}" || "${create}" || "${delete}" ]]; then
+        all-exists
+    fi
+
+    read -p "确定删除所有模块（删除后不可恢复）？[y|n] : " answer
+    if [ "${answer}" = "y" ]; then
+        while read line
+        do
+            m_name=$(echo "${line}" | awk '{print $1}')
+            delete-module "${m_name}"
+        done < "${module_file}"
         exit 0
     fi
 fi
@@ -145,7 +176,7 @@ rename-module() {
     重命名 module 的逻辑
 }
 if [ "${rename}" ]; then
-    if [[ "${delete}" || "${create}" ]]; then
+    if [[ "${delete}" || "${create}" || "${delete_all}" ]]; then
         all-exists
     fi
 
@@ -154,7 +185,7 @@ if [ "${rename}" ]; then
         exit 1
     else
         rename-module "${MODULE}" "${NEW_MODULE}" "${COMMENT}"
+        MODULE_NAME="${NEW_MODULE}"
         exit 0
     fi
 fi
-

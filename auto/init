@@ -1,32 +1,14 @@
 :||{
     程序初始化：
-    1. 创建相应的目录
-    2. 加载配置文件，初始化变量
+    1. 创建相应的目录及文件
     3. 统一命令调用
 
     Author: Jacob
 }
 
-
-# 配置文件目录
-conf_dir="$SCRIPT_HOME/conf"
-[ ! -d "$conf_dir" ] && mkdir -p "$conf_dir"
-
-# prod配置文件目录
-online_conf_dir="$conf_dir/prod"
-[ ! -d "$online_conf_dir" ] && mkdir -p "$online_conf_dir"
-
-# dev配置文件目录
-dev_conf_dir="$conf_dir/dev"
-[ ! -d "$dev_conf_dir" ] && mkdir -p "$dev_conf_dir"
-
-# 日志目录
-logs_dir="$SCRIPT_HOME/logs"
-[ ! -d "$logs_dir" ] && mkdir -p "$logs_dir"
-
-# 数据目录
-data_dir="$SCRIPT_HOME/data"
-[ ! -d "$data_dir" ] && mkdir -p "$data_dir"
+# 生成代码的代码目录
+meta_dir="$SCRIPT_HOME/meta"
+[ ! -d "$meta_dir" ] && mkdir -p "$meta_dir"
 
 # 工具目录
 util_dir="$SCRIPT_HOME/util"
@@ -41,34 +23,10 @@ module_file="$SCRIPT_HOME/modules"
 [ ! -f "$module_file" ] && touch "$module_file"
 
 :||{
-    初始化时加载配置文件
-}
-for file in $conf_dir/*.yaml
-do
-    eval "$(parse "$file")"
-done
-
-for file in $conf_dir/$PROFILE/*.yaml
-do
-    eval "$(parse "$file")"
-done
-
-
-:||{
-    初始化全局变量
-}
-csv2json_file="${util_dir}/csv2json
-json2csv_file="${util_dir}/json2csv
-
-log_name="${log_name}"
-log_file="${logs_dir}/${log_name}"
-
-
-:||{
     根据系统使用不同的jq命令
 }
 jq() {
-    sys_os=$(uname -s)
+    local sys_os=$(uname -s)
     case "${sys_os}" in
         "Darwin")   jq-mac "$@"     ;;
         "Linux")    jq-linux "$@"   ;;
