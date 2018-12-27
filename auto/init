@@ -36,9 +36,9 @@ util_dir="$SCRIPT_HOME/util"
 auto_dir="$SCRIPT_HOME/auto"
 [ ! -d "$auto_dir" ] && mkdir -p "$auto_dir"
 
-# 业务相关目录
-service_dir="$SCRIPT_HOME/service"
-[ ! -d "$service_dir" ] && mkdir -p "$service_dir"
+# 记录模块文件
+module_file="$SCRIPT_HOME/modules"
+[ ! -f "$module_file" ] && touch "$module_file"
 
 :||{
     初始化时加载配置文件

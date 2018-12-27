@@ -5,10 +5,16 @@
 }
 
 
-help=no
-version=no
+help=
+version=
 
-PROFILE=
+create=
+rename=
+delete=
+
+MODULE=
+NEW_MODULE=
+COMMENT=
 
 opt=
 
@@ -23,41 +29,124 @@ do
     case "$option" in
         -h|--help)               help=yes                      ;;
         -v|--version)            version=yes                   ;;
-        --profile=*)             PROFILE="$value"              ;;
+        --create)                create=yes                    ;;
+        --delete)                delete=yes                    ;;
+        --comment=*)             COMMENT="${value}"            ;;
+        --module=*)              MODULE="${value}"             ;;
+        --new-name=*)            NEW_MODULE="${value}"         ;;
+        --rename)                rename=yes                    ;;
         *)
-            echo "$0: error: invalid option \"$option\""
+            echo "${0}: error: invalid option \"$option\""
+            echo " please exec \"${0} -h\" "
             exit 1
             ;;
     esac
 done
 
-if [ $help = yes ]; then
+if [ "${help}" ]; then
     cat << END
 
-  -h | --help                        print this message
-  -v | --version                     show version
-  --profile                          env: online || dev
+  -h | --help                        帮助信息
+  -v | --version                     版本
+  --create                           创建模块，加此参数，则module和comment必须指定，与 --rename --delete 不能同时出现
+  --rename                           修改模块名，加此参数，则module new-name comment必须指定，与 --create --delete 不能同时出现
+  --delete                           删除模块，加此参数，则module必须指定，与 --rename --create 不能同时出现
+  --module=module-name               指定模块名
+  --new-name=new-module-name         指定新的模块名，--rename 配合使用
 
 END
     exit 1
 fi
 
-if [ $version = yes ]; then
+if [ "${version}" ]; then
     cat << END
 
-  $0 is 1.0.0
+  $0 is 1.0.1
 
 END
     exit 1
 fi
 
-if [ ! $PROFILE ]; then
-    cat << END
+echo-msg() {
+    echo
+    echo "  ${1}"
+    echo
+}
 
-  profile is not blank !!
-  need help?
-  please exec " $0 -h "
-
-END
+all-exists() {
+    echo-msg "--create --delete --rename 三个参数，同一时间只能出现一次"
     exit 1
+}
+
+create-module() {
+    module_dir="${SCRIPT_HOME}/${1}"
+    if [ ! -d "${module_dir}" ]; then
+        mkdir -p "${module_dir}"
+        echo "${1} #${2}" >> "${module_file}"
+        echo-msg "创建模块：${1} 成功！路径为：${module_dir}"
+    fi
+}
+
+:||{
+    创建 module 的逻辑
+}
+if [ "${create}" ]; then
+    if [[ "${rename}" || "${delete}" ]]; then
+        all-exists
+    fi
+
+    if [[ ! "${COMMENT}" || ! "${MODULE}" ]]; then
+        echo-msg "创建模块名，必须指定模块名及描述信息，--module，--comment不能为空"
+        exit 1
+    else
+        create-module "${MODULE}" "${COMMENT}"
+        exit 0
+    fi
 fi
+
+delete-module() {
+    module_dir="${SCRIPT_HOME}/${1}"
+    if [ -d "${module_dir}" ]; then
+        rm -rf "${module_dir}"
+        sed -ig "/${1}/d" "${module_file}"
+        rm "${module_file}"[a-z]
+        echo-msg "删除模块：${1} 成功！"
+    fi
+}
+
+:||{
+    删除 module 的逻辑
+}
+if [ "${delete}" ]; then
+    if [[ "${rename}" || "${create}" ]]; then
+        all-exists
+    fi
+
+    if [[ ! "${MODULE}" ]]; then
+        echo-msg "删除模块，必须指定模块名，--module不能为空"
+        exit 1
+    else
+        delete-module "${MODULE}"
+        exit 0
+    fi
+fi
+
+
+:||{
+    重命名 module 的逻辑
+}
+if [ "${rename}" ]; then
+    if [[ "${delete}" || "${create}" ]]; then
+        all-exists
+    fi
+
+    if [[ ! "${MODULE}" || ! "${COMMENT}" || ! "${NEW_MODULE}" ]]; then
+        echo-msg "重命名模块，必须指定模块名等，--module --comment --new-name 不能为空"
+        exit 1
+    else
+        delete-module "${MODULE}"
+        create-module "${NEW_MODULE}" "${COMMENT}"
+        exit 0
+    fi
+fi
+
