@@ -79,7 +79,7 @@ all-exists() {
 }
 
 create-module() {
-    module_dir="${SCRIPT_HOME}/${1}"
+    local module_dir="${SCRIPT_HOME}/${1}"
     if [ ! -d "${module_dir}" ]; then
         mkdir -p "${module_dir}"
         echo "${1} #${2}" >> "${module_file}"
@@ -105,11 +105,10 @@ if [ "${create}" ]; then
 fi
 
 delete-module() {
-    module_dir="${SCRIPT_HOME}/${1}"
+    local module_dir="${SCRIPT_HOME}/${1}"
     if [ -d "${module_dir}" ]; then
         rm -rf "${module_dir}"
-        sed -ig "/${1}/d" "${module_file}"
-        rm "${module_file}"[a-z]
+        sed -ig "/${1}/d" "${module_file}" && rm "${module_file}"[a-z]
         echo-msg "删除模块：${1} 成功！"
     fi
 }
@@ -131,6 +130,16 @@ if [ "${delete}" ]; then
     fi
 fi
 
+rename-module() {
+    local src_module_dir="${SCRIPT_HOME}/${1}"
+    local new_module_dir="${SCRIPT_HOME}/${2}"
+    if [ -d "${src_module_dir}" ]; then
+        mv "${src_module_dir}" "${new_module_dir}"
+        sed -ig "/${1}/d" "${module_file}" && rm "${module_file}"[a-z]
+        echo "${2} #${3}" >> "${module_file}"
+        echo-msg "重命名模块：${1} 成功！重命名后的模块路径：${new_module_dir}"
+    fi
+}
 
 :||{
     重命名 module 的逻辑
@@ -144,8 +153,7 @@ if [ "${rename}" ]; then
         echo-msg "重命名模块，必须指定模块名等，--module --comment --new-name 不能为空"
         exit 1
     else
-        delete-module "${MODULE}"
-        create-module "${NEW_MODULE}" "${COMMENT}"
+        rename-module "${MODULE}" "${NEW_MODULE}" "${COMMENT}"
         exit 0
     fi
 fi
