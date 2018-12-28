@@ -57,9 +57,10 @@ if [[ "${help}" && ! "${MODULE}" ]]; then
     cat << END
 
   -h | --help                        帮助信息
-  -v | --version                     版本
+  -v | --version                     版本信息
   --create                           创建模块，加此参数，则module和comment必须指定，与 --rename --delete --delete-all 不能同时出现
   --rename                           修改模块名，加此参数，则module new-name comment必须指定，与 --create --delete --delete-all 不能同时出现
+  --comment                          注释，与 --create | --rename 同用，解释模块的功能
   --delete                           删除模块，加此参数，则module必须指定，与 --rename --create --delete-all 不能同时出现
   --delete-all                       删除所有模块，与 --rename --create --delete 不能同时出现
   --module=module-name               指定模块名：单独使用时，表示运行指定的模块，若有参数，则执行的是模块程序的参数
