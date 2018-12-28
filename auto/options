@@ -7,6 +7,7 @@
 help=
 version=
 
+show=
 create=
 rename=
 delete=
@@ -34,6 +35,7 @@ do
     case "$option" in
         -h|--help)               help=yes                      ;;
         -v|--version)            version=yes                   ;;
+        --show)                  show=yes                      ;;
         --create)                create=yes                    ;;
         --delete)                delete=yes                    ;;
         --delete-all)            delete_all=yes                ;;
@@ -58,11 +60,12 @@ if [[ "${help}" && ! "${MODULE}" ]]; then
 
   -h | --help                        帮助信息
   -v | --version                     版本信息
-  --create                           创建模块，加此参数，则module和comment必须指定，与 --rename --delete --delete-all 不能同时出现
-  --rename                           修改模块名，加此参数，则module new-name comment必须指定，与 --create --delete --delete-all 不能同时出现
+  --show                             查看所有模块，加此参数，与 --create --rename --delete --delete-all 不能同时出现
+  --create                           创建模块，加此参数，则module和comment必须指定，与 --show --rename --delete --delete-all 不能同时出现
+  --rename                           修改模块名，加此参数，则module new-name comment必须指定，与 --show --create --delete --delete-all 不能同时出现
   --comment                          注释，与 --create | --rename 同用，解释模块的功能
-  --delete                           删除模块，加此参数，则module必须指定，与 --rename --create --delete-all 不能同时出现
-  --delete-all                       删除所有模块，与 --rename --create --delete 不能同时出现
+  --delete                           删除模块，加此参数，则module必须指定，与 --show --rename --create --delete-all 不能同时出现
+  --delete-all                       删除所有模块，与 --show --rename --create --delete 不能同时出现
   --module=module-name               指定模块名：单独使用时，表示运行指定的模块，若有参数，则执行的是模块程序的参数
   --new-name=new-module-name         指定新的模块名，--rename 配合使用
 
@@ -80,7 +83,7 @@ END
 fi
 
 all-exists() {
-    echo-msg "--create --delete --rename --delete-all 参数，同一时间只能出现一次"
+    echo-msg "--show --create --delete --rename --delete-all 参数，同一时间只能出现一次"
     exit 1
 }
 
@@ -90,6 +93,25 @@ generate-code() {
     init > "${modules_dir}/${MODULE}/auto/init"
     args > "${modules_dir}/${MODULE}/auto/options"
 }
+
+:||{
+    show 模块的逻辑
+}
+if [ "${show}" ]; then
+    if [[ "${rename}" || "${delete}" || "${delete_all}" || "${create}" ]]; then
+        all-exists
+    fi
+
+    if [ -s "${modules_file}" ]; then
+        echo
+        echo "现有模块："
+        cat "${modules_file}"
+        echo
+    else
+        echo-msg "无模块！请创建！"
+    fi
+fi
+
 
 create-module() {
     local module_dir="${modules_dir}/${1}"
@@ -108,7 +130,7 @@ create-module() {
     创建 module 的逻辑
 }
 if [ "${create}" ]; then
-    if [[ "${rename}" || "${delete}" || "${delete_all}" ]]; then
+    if [[ "${rename}" || "${delete}" || "${delete_all}" || "${show}" ]]; then
         all-exists
     fi
 
@@ -136,7 +158,7 @@ delete-module() {
     删除 module 的逻辑
 }
 if [ "${delete}" ]; then
-    if [[ "${rename}" || "${create}" || "${delete_all}" ]]; then
+    if [[ "${rename}" || "${create}" || "${delete_all}" || "${show}" ]]; then
         all-exists
     fi
 
@@ -155,7 +177,7 @@ if [ "${delete}" ]; then
 fi
 
 if [ "${delete_all}" ]; then
-    if [[ "${rename}" || "${create}" || "${delete}" ]]; then
+    if [[ "${rename}" || "${create}" || "${delete}" || "${show}" ]]; then
         all-exists
     fi
 
@@ -189,7 +211,7 @@ rename-module() {
     重命名 module 的逻辑
 }
 if [ "${rename}" ]; then
-    if [[ "${delete}" || "${create}" || "${delete_all}" ]]; then
+    if [[ "${delete}" || "${create}" || "${delete_all}" || "${show}" ]]; then
         all-exists
     fi
 
@@ -216,7 +238,7 @@ fi
     module 的逻辑：单独使用时，将所有的参数（除--module=submodule）传递给子模块
 }
 if [ "${MODULE}" ]; then
-    if [[ ! "${rename}" || ! "${delete}" || ! "${create}" || ! "${delete_all}" ]]; then
+    if [[ ! "${rename}" || ! "${delete}" || ! "${create}" || ! "${delete_all}" || ! "${show}" ]]; then
         SUB_MODULE_OPTS=$(echo "$@" | sed 's/--module=[a-z0-9A-Z]*//')
     fi
 fi
