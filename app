@@ -10,13 +10,13 @@
 [ -f $HOME/.bashrc ] && . "$HOME/.bashrc"
 
 export SCRIPT_HOME=$(dirname "$0")
-export PATH=$SCRIPT_HOME/auto:$SCRIPT_HOME/meta:$SCRIPT_HOME/util:$PATH
+export PATH=$SCRIPT_HOME/auto:$SCRIPT_HOME/meta:$SCRIPT_HOME/utils:$PATH
 
 . init
 . options
 
 check-module() {
-    local current_module=$(grep "${1}" ${module_file})
+    local current_module=$(grep "${1}" ${modules_file})
     if [ ! "${current_module}" ]; then
         echo-msg "未找到 ${1} 模块！"
         exit 1
@@ -25,8 +25,9 @@ check-module() {
 
 if [ "${MODULE}" ]; then
     export -f jq
+    export modules_dir=${modules_dir}
     export SUBMODULE="${MODULE}"
 
     check-module "${MODULE}"
-    ${SCRIPT_HOME}/${MODULE}/${MODULE} ${SUB_MODULE_OPTS}
+    ${modules_dir}/${MODULE}/${MODULE} ${SUB_MODULE_OPTS}
 fi

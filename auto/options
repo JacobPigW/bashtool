@@ -86,16 +86,16 @@ all-exists() {
 
 generate-code() {
     . code
-    main > "${SCRIPT_HOME}/${MODULE}/${MODULE}" && chmod u+x "${SCRIPT_HOME}/${MODULE}/${MODULE}"
-    init > "${SCRIPT_HOME}/${MODULE}/auto/init"
-    args > "${SCRIPT_HOME}/${MODULE}/auto/options"
+    main > "${modules_dir}/${MODULE}/${MODULE}" && chmod u+x "${modules_dir}/${MODULE}/${MODULE}"
+    init > "${modules_dir}/${MODULE}/auto/init"
+    args > "${modules_dir}/${MODULE}/auto/options"
 }
 
 create-module() {
-    local module_dir="${SCRIPT_HOME}/${1}"
+    local module_dir="${modules_dir}/${1}"
     if [ ! -d "${module_dir}" ]; then
         mkdir -p "${module_dir}"
-        echo "${1} #${2}" >> "${module_file}"
+        echo "${1} # ${2}" >> "${modules_file}"
         echo-msg "创建模块：${1} 成功！路径为：${module_dir}"
         MODULE_NAME="${MODULE}"
         generate-code
@@ -122,10 +122,10 @@ if [ "${create}" ]; then
 fi
 
 delete-module() {
-    local module_dir="${SCRIPT_HOME}/${1}"
+    local module_dir="${modules_dir}/${1}"
     if [ -d "${module_dir}" ]; then
         rm -rf "${module_dir}"
-        sed -ig "/${1}/d" "${module_file}" && rm "${module_file}"[a-z]
+        sed -ig "/${1}/d" "${modules_file}" && rm "${modules_file}"[a-z]
         echo-msg "删除模块：${1} 成功！"
     else
         echo-msg "${1} 模块不存在！"
@@ -165,7 +165,7 @@ if [ "${delete_all}" ]; then
         do
             m_name=$(echo "${line}" | awk '{print $1}')
             delete-module "${m_name}"
-        done < "${module_file}"
+        done < "${modules_file}"
         exit 0
     else
         exit 0
@@ -173,12 +173,12 @@ if [ "${delete_all}" ]; then
 fi
 
 rename-module() {
-    local src_module_dir="${SCRIPT_HOME}/${1}"
-    local new_module_dir="${SCRIPT_HOME}/${2}"
+    local src_module_dir="${modules_dir}/${1}"
+    local new_module_dir="${modules_dir}/${2}"
     if [ -d "${src_module_dir}" ]; then
         mv "${src_module_dir}" "${new_module_dir}"
-        sed -ig "/${1}/d" "${module_file}" && rm "${module_file}"[a-z]
-        echo "${2} #${3}" >> "${module_file}"
+        sed -ig "/${1}/d" "${modules_file}" && rm "${modules_file}"[a-z]
+        echo "${2} #${3}" >> "${modules_file}"
         echo-msg "重命名模块：${1} 成功！重命名后的模块路径：${new_module_dir}"
     else
         echo-msg "${1} 模块不存在！"

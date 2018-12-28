@@ -1,4 +1,4 @@
-MODULE_HOME="${SCRIPT_HOME}/${MODULE_NAME}"
+MODULE_HOME="${modules_dir}/${MODULE_NAME}"
 
 # 自动执行脚本目录
 auto_dir="$MODULE_HOME/auto"
@@ -18,7 +18,7 @@ main() {
     Author: $(whoami)
 }
 
-export MODULE_HOME="\${SCRIPT_HOME}/${MODULE_NAME}"
+export MODULE_HOME="\${modules_dir}/${MODULE_NAME}"
 export PATH=\$MODULE_HOME/auto:\$PATH
 
 . yaml
@@ -31,6 +31,8 @@ export PATH=\$MODULE_HOME/auto:\$PATH
 . log
 . time
 . util
+
+echo '{"msg":"Hello World !"}' | jq '.'
 
 END
 }
@@ -67,6 +69,23 @@ logs_dir="\$MODULE_HOME/logs"
 data_dir="\$MODULE_HOME/data"
 [ ! -d "\$data_dir" ] && mkdir -p "\$data_dir"
 
+# 依赖库目录
+libs_dir="\$MODULE_HOME/libs"
+[ ! -d "\$libs_dir" ] && mkdir -p "\$libs_dir"
+
+# 模块主配置文件
+module_conf_file="\$conf_dir/$MODULE_NAME.yaml"
+[ ! -f "\$module_conf_file" ] && touch "\$module_conf_file"
+
+
+cat << MSG > \${module_conf_file}
+
+--
+log:
+  name: $MODULE_NAME.log
+
+MSG
+
 
 :||{
     初始化时加载配置文件
@@ -84,9 +103,8 @@ done
 
 :||{
     初始化全局变量
-
-    e.g. log_file="\${logs_dir}/\${log_name}"
 }
+log_file="\${logs_dir}/\${log_name}"
 
 
 END
