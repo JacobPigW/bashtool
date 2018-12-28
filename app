@@ -15,8 +15,18 @@ export PATH=$SCRIPT_HOME/auto:$SCRIPT_HOME/meta:$SCRIPT_HOME/util:$PATH
 . init
 . options
 
-export -f jq
+check-module() {
+    local current_module=$(grep "${1}" ${module_file})
+    if [ ! "${current_module}" ]; then
+        echo-msg "未找到 ${1} 模块！"
+        exit 1
+    fi
+}
 
 if [ "${MODULE}" ]; then
-    ${SCRIPT_HOME}/${MODULE}/${MODULE} 
+    export -f jq
+    export SUBMODULE="${MODULE}"
+
+    check-module "${MODULE}"
+    ${SCRIPT_HOME}/${MODULE}/${MODULE} ${SUB_MODULE_OPTS}
 fi

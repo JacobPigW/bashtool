@@ -22,6 +22,7 @@ auto_dir="$SCRIPT_HOME/auto"
 module_file="$SCRIPT_HOME/modules"
 [ ! -f "$module_file" ] && touch "$module_file"
 
+
 :||{
     根据系统使用不同的jq命令
 }
@@ -32,4 +33,14 @@ jq() {
         "Linux")    jq-linux "$@"   ;;
         *)          jq-linux "$@"   ;;
     esac
+}
+
+
+:||{
+    打印信息
+}
+echo-msg() {
+    echo
+    echo "  ${1}"
+    echo
 }

@@ -125,8 +125,8 @@ do
         -v|--version)            version=yes                   ;;
         --profile=*)             PROFILE="\$value"              ;;
         *)
-            echo "\$0: error: invalid option \"\$option\""
-            echo " please exec \"\${0} -h\" "
+            echo "Submodule \${SUBMODULE}: error: invalid option \"\$option\""
+            echo " please exec \" -h | --help\" "
             exit 1
             ;;
     esac
@@ -146,7 +146,7 @@ fi
 if [ \$version = yes ]; then
     cat << MSG
 
-  \$0 is 1.0.0
+  Submodule \${SUBMODULE} is 1.0.0
 
 MSG
     exit 1
@@ -157,7 +157,7 @@ if [ ! \$PROFILE ]; then
 
   profile is not blank !!
   need help?
-  please exec " \$0 -h "
+  please exec "  -h | --help "
 
 MSG
     exit 1

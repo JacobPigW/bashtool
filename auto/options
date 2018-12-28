@@ -11,14 +11,17 @@ create=
 rename=
 delete=
 delete_all=
+invalid=
 
 MODULE=
 NEW_MODULE=
 COMMENT=
+INVALID_OPT=
 
 opt=
 
 MODULE_NAME=
+SUB_MODULE_OPTS=
 
 for option
 do
@@ -39,29 +42,34 @@ do
         --new-name=*)            NEW_MODULE="${value}"         ;;
         --rename)                rename=yes                    ;;
         *)
-            echo "${0}: error: invalid option \"$option\""
-            echo " please exec \"${0} -h\" "
-            exit 1
-            ;;
+            invalid=yes
+            INVALID_OPT="${INVALID_OPT} ${option}"
+        ;;
     esac
 done
 
-if [ "${help}" ]; then
+if [[ "${invalid}" && ! "${MODULE}" ]]; then
+    echo-msg "$0: error: invalid option \"${INVALID_OPT}\" !"
+    exit 1
+fi
+
+if [[ "${help}" && ! "${MODULE}" ]]; then
     cat << END
 
   -h | --help                        帮助信息
   -v | --version                     版本
-  --create                           创建模块，加此参数，则module和comment必须指定，与 --rename --delete 不能同时出现
-  --rename                           修改模块名，加此参数，则module new-name comment必须指定，与 --create --delete 不能同时出现
-  --delete                           删除模块，加此参数，则module必须指定，与 --rename --create 不能同时出现
-  --module=module-name               指定模块名，单独使用时，表示运行指定的模块
+  --create                           创建模块，加此参数，则module和comment必须指定，与 --rename --delete --delete-all 不能同时出现
+  --rename                           修改模块名，加此参数，则module new-name comment必须指定，与 --create --delete --delete-all 不能同时出现
+  --delete                           删除模块，加此参数，则module必须指定，与 --rename --create --delete-all 不能同时出现
+  --delete-all                       删除所有模块，与 --rename --create --delete 不能同时出现
+  --module=module-name               指定模块名：单独使用时，表示运行指定的模块，若有参数，则执行的是模块程序的参数
   --new-name=new-module-name         指定新的模块名，--rename 配合使用
 
 END
     exit 1
 fi
 
-if [ "${version}" ]; then
+if [[ "${version}" && ! "${MODULE}" ]]; then
     cat << END
 
   $0 is 1.0.1
@@ -69,12 +77,6 @@ if [ "${version}" ]; then
 END
     exit 1
 fi
-
-echo-msg() {
-    echo
-    echo "  ${1}"
-    echo
-}
 
 all-exists() {
     echo-msg "--create --delete --rename --delete-all 参数，同一时间只能出现一次"
@@ -96,6 +98,8 @@ create-module() {
         echo-msg "创建模块：${1} 成功！路径为：${module_dir}"
         MODULE_NAME="${MODULE}"
         generate-code
+    else
+        echo-msg "${1} 模块已经存在！"
     fi
 }
 
@@ -122,6 +126,8 @@ delete-module() {
         rm -rf "${module_dir}"
         sed -ig "/${1}/d" "${module_file}" && rm "${module_file}"[a-z]
         echo-msg "删除模块：${1} 成功！"
+    else
+        echo-msg "${1} 模块不存在！"
     fi
 }
 
@@ -142,6 +148,8 @@ if [ "${delete}" ]; then
     if [ "${answer}" = "y" ]; then
         delete-module "${MODULE}"
         exit 0
+    else
+        exit 0
     fi
 fi
 
@@ -158,6 +166,8 @@ if [ "${delete_all}" ]; then
             delete-module "${m_name}"
         done < "${module_file}"
         exit 0
+    else
+        exit 0
     fi
 fi
 
@@ -169,6 +179,8 @@ rename-module() {
         sed -ig "/${1}/d" "${module_file}" && rm "${module_file}"[a-z]
         echo "${2} #${3}" >> "${module_file}"
         echo-msg "重命名模块：${1} 成功！重命名后的模块路径：${new_module_dir}"
+    else
+        echo-msg "${1} 模块不存在！"
     fi
 }
 
@@ -187,5 +199,23 @@ if [ "${rename}" ]; then
         rename-module "${MODULE}" "${NEW_MODULE}" "${COMMENT}"
         MODULE_NAME="${NEW_MODULE}"
         exit 0
+    fi
+fi
+
+:||{
+    new-name 的逻辑
+}
+if [ "${NEW_MODULE}" ]; then
+    if [[ ! "${rename}" ]]; then
+        echo-msg "必须与 --rename 配合使用"
+    fi
+fi
+
+:||{
+    module 的逻辑：单独使用时，将所有的参数（除--module=submodule）传递给子模块
+}
+if [ "${MODULE}" ]; then
+    if [[ ! "${rename}" || ! "${delete}" || ! "${create}" || ! "${delete_all}" ]]; then
+        SUB_MODULE_OPTS=$(echo "$@" | sed 's/--module=[a-z0-9A-Z]*//')
     fi
 fi
