@@ -23,7 +23,7 @@ modules_dir="$SCRIPT_HOME/modules"
 [ ! -d "$modules_dir" ] && mkdir -p "$modules_dir"
 
 # 记录模块文件
-modules_file="$modules_dir/settings"
+modules_file="$modules_dir/.settings"
 [ ! -f "$modules_file" ] && touch "$modules_file"
 
 
