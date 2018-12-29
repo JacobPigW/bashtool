@@ -19,11 +19,11 @@ auto_dir="$SCRIPT_HOME/auto"
 [ ! -d "$auto_dir" ] && mkdir -p "$auto_dir"
 
 # 自定义模块目录
-export modules_dir="$SCRIPT_HOME/modules"
+modules_dir="$SCRIPT_HOME/modules"
 [ ! -d "$modules_dir" ] && mkdir -p "$modules_dir"
 
 # 记录模块文件
-modules_file="$SCRIPT_HOME/settings"
+modules_file="$modules_dir/settings"
 [ ! -f "$modules_file" ] && touch "$modules_file"
 
 

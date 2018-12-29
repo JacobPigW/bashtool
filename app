@@ -16,7 +16,7 @@ export PATH=$SCRIPT_HOME/auto:$SCRIPT_HOME/meta:$SCRIPT_HOME/utils:$PATH
 . options
 
 check-module() {
-    local current_module=$(grep "${1}" ${modules_file})
+    local current_module=$(awk '{print $1}' ${modules_file} | grep "${1}")
     if [ ! "${current_module}" ]; then
         echo-msg "未找到 ${1} 模块！"
         exit 1
@@ -29,5 +29,5 @@ if [ "${MODULE}" ]; then
     export SUBMODULE="${MODULE}"
 
     check-module "${MODULE}"
-    ${modules_dir}/${MODULE}/${MODULE} ${SUB_MODULE_OPTS}
+    (${modules_dir}/${MODULE}/${MODULE} ${SUB_MODULE_OPTS})
 fi

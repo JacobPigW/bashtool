@@ -197,8 +197,10 @@ fi
 rename-module() {
     local src_module_dir="${modules_dir}/${1}"
     local new_module_dir="${modules_dir}/${2}"
+    
     if [ -d "${src_module_dir}" ]; then
         mv "${src_module_dir}" "${new_module_dir}"
+        mv "${new_module_dir}/${1}" "${new_module_dir}/${2}"
         sed -ig "/${1}/d" "${modules_file}" && rm "${modules_file}"[a-z]
         echo "${2} #${3}" >> "${modules_file}"
         echo-msg "重命名模块：${1} 成功！重命名后的模块路径：${new_module_dir}"
@@ -217,6 +219,9 @@ if [ "${rename}" ]; then
 
     if [[ ! "${MODULE}" || ! "${COMMENT}" || ! "${NEW_MODULE}" ]]; then
         echo-msg "重命名模块，必须指定模块名等，--module --comment --new-name 不能为空"
+        exit 1
+    elif [ "${MODULE}" = "${NEW_MODULE}" ]; then
+        echo-msg "重命名后的模块名与原模块名一致！"
         exit 1
     else
         rename-module "${MODULE}" "${NEW_MODULE}" "${COMMENT}"

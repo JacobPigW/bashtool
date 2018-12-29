@@ -13,12 +13,12 @@ main() {
 #!/usr/bin/env bash
 
 :||{
-    ${MODULE_NAME} 模块入口
+    模块入口
 
     Author: $(whoami)
 }
 
-export MODULE_HOME="\${modules_dir}/${MODULE_NAME}"
+export MODULE_HOME="\${modules_dir}/\${SUBMODULE}"
 export PATH=\$MODULE_HOME/auto:\$PATH
 
 . yaml
@@ -44,7 +44,7 @@ END
 init() {    
     cat << END
 :||{
-    ${MODULE_NAME} 模块初始化
+    模块初始化
 
     Author: $(whoami)
 }
@@ -74,17 +74,8 @@ libs_dir="\$MODULE_HOME/libs"
 [ ! -d "\$libs_dir" ] && mkdir -p "\$libs_dir"
 
 # 模块主配置文件
-module_conf_file="\$conf_dir/$MODULE_NAME.yaml"
+module_conf_file="\$conf_dir/\$SUBMODULE.yaml"
 [ ! -f "\$module_conf_file" ] && touch "\$module_conf_file"
-
-
-cat << MSG > \${module_conf_file}
-
---
-log:
-  name: $MODULE_NAME.log
-
-MSG
 
 
 :||{
@@ -104,7 +95,7 @@ done
 :||{
     初始化全局变量
 }
-log_file="\${logs_dir}/\${log_name}"
+log_file="\${logs_dir}/\${SUBMODULE}.log"
 
 
 END
@@ -117,7 +108,7 @@ END
 args() {
     cat << END
 :||{
-    ${MODULE_NAME} 模块参数及使用方式
+    模块参数及使用方式
 
     Author: $(whoami)
 }
