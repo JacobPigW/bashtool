@@ -3,7 +3,8 @@
     ./auto/: 全局脚本参数设定、脚本初始化
     ./meta/: 生成代码的代码
     ./util/: 通用的工具，jq、log、time、http、yaml文件解析等
-    ./settings: 记录所有模块的文件
+    ./modules/: 模块所在目录
+    ./modules/.settings: 记录所有模块的文件
     ./app: 主程序文件
 
 模块功能：
